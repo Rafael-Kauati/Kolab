@@ -25,6 +25,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.0.6
+          bundler-cache: true
+          working-directory: kolab
+
       # Adicione o passo para atualizar a gem xpath
       - name: Update xpath gem
         run: bundle update xpath
@@ -50,7 +57,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Adicione o passo para atualizar a gem xpath
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.0.6
+          bundler-cache: true
+          working-directory: kolab
+
       - name: Update xpath gem
         run: bundle update xpath
         working-directory: kolab
