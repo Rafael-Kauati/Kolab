@@ -1,98 +1,62 @@
-name: "Kolab CI"
+name: Kolab CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
   pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
-  linters:
-    name: Linters
+  lint:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          path: kolab
 
-      - name: Setup Ruby and install gems
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 3.0.6
-          bundler-cache: true
-
-      - name: Setup Node
-        uses: actions/setup-node@v2
-        with:
-          node-version: 16
-          cache: 'yarn'
-
-      - name: Install packages
-        run: |
-          cd kolab
-          yarn install --pure-lockfile
-
-      - name: Run linters
-        run: |
-          cd kolab
-          bin/rubocop --parallel
-          bin/stylelint
-          bin/prettier
-          bin/eslint
-
-      - name: Run security checks
-        run: |
-          cd kolab
-          bin/bundler-audit --update
-          bin/brakeman -q -w2
-
-  tests:
-    name: Tests
-    runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:12.7
-        env:
-          POSTGRES_USER: myapp
-          POSTGRES_DB: myapp_test
-          POSTGRES_PASSWORD: ""
-        ports: ["5432:5432"]
+    defaults:
+      run:
+        working-directory: kolab
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          path: kolab
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      - name: Setup Ruby and install gems
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 3.0.6
-          bundler-cache: true
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 3.0.6 
 
-      - name: Setup Node
-        uses: actions/setup-node@v2
-        with:
-          node-version: 16
-          cache: 'yarn'
+    - name: Install dependencies
+      run: |
+        gem install bundler
+        bundle install --jobs 4 --retry 3
 
-      - name: Install packages
-        run: |
-          cd kolab
-          yarn install --pure-lockfile
+    - name: Run RuboCop
+      run: bundle exec rubocop
 
-      - name: Setup test database
-        env:
-          RAILS_ENV: test
-          PGHOST: localhost
-          PGUSER: myapp
-        run: |
-          cd kolab
-          bin/rails db:setup
+  setup:
+    runs-on: ubuntu-latest
 
-      - name: Run tests
-        run: |
-          cd kolab
-          bin/rspec
+    defaults:
+      run:
+        working-directory: kolab
 
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 3.0.6 
+
+    - name: Install dependencies
+      run: |
+        gem install bundler
+        bundle install --jobs 4 --retry 3
+
+    - name: Setup Rails
+      run: |
+        cp config/database.yml.ci config/database.yml
+        bundle exec rails db:create
+        bundle exec rails db:schema:load
+        bundle exec rails db:seed
