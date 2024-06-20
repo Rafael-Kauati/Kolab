@@ -7,81 +7,85 @@ on:
     branches: [ "main" ]
 
 jobs:
-  test:
+  linters:
+    name: Linters
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Ruby and install gems
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          cache: yarn
+
+      - name: Install packages
+        run: |
+          yarn install --pure-lockfile
+        working-directory: kolab
+
+      - name: Run linters
+        run: |
+          bin/rubocop --parallel
+          bin/stylelint
+          bin/prettier
+          bin/eslint
+        working-directory: kolab
+
+      - name: Run security checks
+        run: |
+          bin/bundler-audit --update
+          bin/brakeman -q -w2
+        working-directory: kolab
+
+  tests:
+    name: Tests
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:11-alpine
-        ports:
-          - "5432:5432"
+        image: postgres:12.7
         env:
-          POSTGRES_DB: rails_test
-          POSTGRES_USER: rails
-          POSTGRES_PASSWORD: password
-    env:
-      RAILS_ENV: test
-      DATABASE_URL: "postgres://rails:password@localhost:5432/rails_test"
+          POSTGRES_USER: myapp
+          POSTGRES_DB: myapp_test
+          POSTGRES_PASSWORD: ""
+        ports: ["5432:5432"]
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
 
-      - name: Set up Ruby
+      - name: Setup Ruby and install gems
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.0.6
           bundler-cache: true
-          working-directory: kolab
 
-      # Adicione o passo para atualizar a gem xpath
-      - name: Update xpath gem
-        run: bundle update xpath
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          cache: yarn
+
+      - name: Install packages
+        run: |
+          yarn install --pure-lockfile
         working-directory: kolab
 
-      - name: Install Ruby and gems
-        uses: ruby/setup-ruby@55283cc23133118229fd3f97f9336ee23a179fcf # v1.146.0
-        with:
-          bundler-cache: true
-          working-directory: kolab
-
-      - name: Set up database schema
-        run: bin/rails db:schema:load
+      - name: Setup test database
+        env:
+          RAILS_ENV: test
+          PGHOST: localhost
+          PGUSER: myapp
+        run: |
+          bin/rails db:setup
         working-directory: kolab
 
       - name: Run tests
-        run: bin/rake
+        run: bin/rspec
         working-directory: kolab
 
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 3.0.6
-          bundler-cache: true
-          working-directory: kolab
-
-      - name: Update xpath gem
-        run: bundle update xpath
-        working-directory: kolab
-
-      - name: Install Ruby and gems
-        uses: ruby/setup-ruby@55283cc23133118229fd3f97f9336ee23a179fcf # v1.146.0
-        with:
-          bundler-cache: true
-          working-directory: kolab
-
-      - name: Security audit dependencies
-        run: bin/bundler-audit --update
-        working-directory: kolab
-
-      - name: Security audit application code
-        run: bin/brakeman -q -w2
-        working-directory: kolab
-
-      - name: Lint Ruby files
-        run: bin/rubocop --parallel
-        working-directory: kolab
