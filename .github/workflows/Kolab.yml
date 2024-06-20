@@ -28,6 +28,7 @@ jobs:
     - name: Install dependencies
       run: |
         gem install bundler
+        bundle update xpath
         bundle install --jobs 4 --retry 3
 
     - name: Run RuboCop
