@@ -26,26 +26,26 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 16
-          cache: yarn
+          cache: 'yarn'
 
       - name: Install packages
         run: |
+          cd kolab
           yarn install --pure-lockfile
-        working-directory: kolab
 
       - name: Run linters
         run: |
+          cd kolab
           bin/rubocop --parallel
           bin/stylelint
           bin/prettier
           bin/eslint
-        working-directory: kolab
 
       - name: Run security checks
         run: |
+          cd kolab
           bin/bundler-audit --update
           bin/brakeman -q -w2
-        working-directory: kolab
 
   tests:
     name: Tests
@@ -75,12 +75,12 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 16
-          cache: yarn
+          cache: 'yarn'
 
       - name: Install packages
         run: |
+          cd kolab
           yarn install --pure-lockfile
-        working-directory: kolab
 
       - name: Setup test database
         env:
@@ -88,10 +88,11 @@ jobs:
           PGHOST: localhost
           PGUSER: myapp
         run: |
+          cd kolab
           bin/rails db:setup
-        working-directory: kolab
 
       - name: Run tests
-        run: bin/rspec
-        working-directory: kolab
+        run: |
+          cd kolab
+          bin/rspec
 
