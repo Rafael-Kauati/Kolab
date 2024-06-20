@@ -17,6 +17,7 @@ jobs:
       - name: Setup Ruby and install gems
         uses: ruby/setup-ruby@v1
         with:
+          ruby-version: 3.0.6
           bundler-cache: true
 
       - name: Setup Node
@@ -63,6 +64,7 @@ jobs:
       - name: Setup Ruby and install gems
         uses: ruby/setup-ruby@v1
         with:
+          ruby-version: 3.0.6
           bundler-cache: true
 
       - name: Setup Node
@@ -88,4 +90,5 @@ jobs:
       - name: Run tests
         run: bin/rspec
         working-directory: kolab
+
 
