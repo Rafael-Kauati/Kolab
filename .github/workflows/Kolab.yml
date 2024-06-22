@@ -27,10 +27,11 @@ jobs:
 
     - name: Install dependencies
       run: |
+        pwd
         gem install bundler
-        bundle update xpath
-        bundle update capybara
+        bundle update capybara nokogiri xpath
         bundle install --jobs 4 --retry 3
+        yarn install
 
     - name: Run RuboCop
       run: bundle exec rubocop
@@ -53,8 +54,12 @@ jobs:
 
     - name: Install dependencies
       run: |
+        pwd
         gem install bundler
+        bundle update capybara nokogiri xpath
         bundle install --jobs 4 --retry 3
+        yarn install
+  
 
     - name: Setup Rails
       run: |
