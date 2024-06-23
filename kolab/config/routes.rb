@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  get 'singin/index'
+  get 'login/index'
   get 'frontpage/index'
   root 'frontpage#index'
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
