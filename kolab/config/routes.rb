@@ -1,5 +1,7 @@
 Rails.application.routes.draw do
   get '/singin', to: 'singin#new'  # This would define an 'index' route  get 'login/index'
+  get '/login', to: 'login#index'  # This would define an 'index' route  get 'login/index'
+  
   get 'frontpage/index'
   root 'frontpage#index'
 

@@ -1,2 +1,20 @@
-<h1>Login#index</h1>
-<p>Find me in app/views/login/index.html.erb</p>
+<h1>Login</h1>
+
+<%= form_tag login_path, method: :post do %>
+  <% if flash[:alert] %>
+    <div class="alert alert-danger"><%= flash[:alert] %></div>
+  <% end %>
+  <div class="field">
+    <%= label_tag :email %>
+    <%= text_field_tag :email, nil, autofocus: true %>
+  </div>
+  <div class.field">
+    <%= label_tag :password %>
+    <%= password_field_tag :password %>
+  </div>
+  <div class="actions">
+    <%= submit_tag "Log In", class: "btn" %>
+  </div>
+<% end %>
+
+<p><%= link_to "Sign Up", new_singin_path %></p>
