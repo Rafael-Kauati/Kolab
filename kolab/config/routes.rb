@@ -1,8 +1,9 @@
 Rails.application.routes.draw do
-  get 'singin/index'
-  get 'login/index'
+  get '/singin', to: 'singin#new'  # This would define an 'index' route  get 'login/index'
   get 'frontpage/index'
   root 'frontpage#index'
+
+  resources :singin, only: [:new, :create]
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
