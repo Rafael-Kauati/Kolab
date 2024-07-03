@@ -1,22 +1,22 @@
 <h1>Sign Up</h1>
-<%= form_tag new_singin_path, method: :post do %>
-
-  <div class="field">
-    <%= label_tag :email %>
-    <%= text_field_tag :email, @user.email, autofocus: true %>
+<%= form_with model: @user, url: singin_path do |form| %>
+  <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+  <div>
+    <%= form.label :email %>
+    <%= form.email_field  :email %>
   </div>
 
-  <div class.field>
-    <%= label_tag :password %>
-    <%= password_field_tag :password %>
+  <div>
+    <%= form.label :password %>
+    <%= form.password_field  :password %>
   </div>
 
-  <div class="field">
-    <%= label_tag :password_confirmation %>
-    <%= password_field_tag :password_confirmation %>
+  <div>
+    <%= form.label :password_confirmation %>
+    <%= form.password_field  :password_confirmation %>
   </div>
 
-  <div class="actions">
-    <%= submit_tag "Sign Up", class: "btn" %>
-  </div>
+    <div>
+    <%= form.submit "Sing up" %>
+    </div>
 <% end %>

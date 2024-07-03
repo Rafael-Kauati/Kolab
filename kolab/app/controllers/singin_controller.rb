@@ -4,10 +4,18 @@ class SinginController < ApplicationController
   end
 
   def create
-    @user = User.new(registration_params)
+    puts "Params before user_params: #{params}"
+
+    # Basic validation to check for presence of :user key
+    if !params.key?(:user)
+      flash[:error] = "Invalid user data submitted."
+      return render :new, status: :unprocessable_entity
+    end
+
+    @user = User.new(user_params)
     if @user.save
-      login(@user)  # Assuming you have a login method (explained later)
-      redirect_to root_path, notice: "Successfully registered!"
+      login_url(@user)  
+      redirect_to home_path, notice: "Successfully registered!"
     else
       render :new, status: :unprocessable_entity
     end
@@ -15,7 +23,7 @@ class SinginController < ApplicationController
 
   private
 
-  def registration_params
-    params.require(:user).permit(:email, :password, password_confirmation: true)
+  def user_params
+    params.require(:user).permit(:email, :password, :password_confirmation)
   end
 end
