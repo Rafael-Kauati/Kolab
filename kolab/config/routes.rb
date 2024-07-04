@@ -1,7 +1,10 @@
 Rails.application.routes.draw do
   get '/singin', to: 'singin#new'
   post '/singin', to: 'singin#create'
+
   get '/login', to: 'login#index'
+  post '/login', to: 'login#create'
+
   get 'frontpage/index'
   root 'frontpage#index'
   get '/home', to: 'home#index'
